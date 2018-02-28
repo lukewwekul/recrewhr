@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <title>zadanie</title>
+  <meta charset="utf-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+ </head>
+<body>
+
+    <div ng-app="myApp" ng-controller="queryCtrl">
+
+        <div style="padding: 10px;">
+            szukaj: <input type="text" ng-model="searchInp">
+            <button ng-click="queryBtn()">szukaj</button>
+            <small style="color:red;">{{ errorInfo }}</small>
+        </div>
+
+        <div style="border:1px solid black; padding: 20px;" ng-repeat="x in myData">
+
+            <b>tytuł</b>: "<big><i>{{ x.title }}</i></big>"
+                </br>
+            <b>autorzy</b>: <i>{{ x.author }}</i>
+                </br>
+            <b>ISBN</b>: <i>{{ x.isbn }}</i>, <b>MEN</b>: <i>{{ x.men }}, <b>stron</b>: <i>{{ x.pages_count }}</i>
+                </br>
+            <b>poziom nauczania</b>: <i>{{ x.levels }}</i>
+                </br>
+            <b>przedmiot</b>: <i>{{ x.subject }}</i>, <b>rodzaj publikacji</b>: <i>{{ x.type }}</i>
+                </br>
+            <img src='{{ x.cover }}' style="padding: 10px;">
+                </br>
+            <b>kup tę książkę --> </b><a href='{{ x.url }}'>przejdź do księgarni</a><b> <-- kup tę książkę</b>
+
+        </div>
+        <dir-pagination-controls></dir-pagination-controls>
+
+    </div>
+
+
+    <script>
+    var app = angular.module('myApp', []);
+    app.controller('queryCtrl', function($scope, $http) {
+        $scope.queryBtn = function() {
+
+                        if ($scope.searchInp){
+
+                            if ($scope.searchInp.length<3) {
+                                console.log("mniejsze od 3");
+                                $scope.errorInfo = 'wymagane przynajmniej 3 znaki';
+                            }
+                            else if ($scope.searchInp.length>12) {
+                                console.log("większe od 12");
+                                $scope.errorInfo = 'obsługa maksymalnie 12 znaków, wpisano za dużo';
+                            }
+                            else{
+                                console.log('search query');
+                                $scope.errorInfo = '';
+                                $http.get("https://gwo.pl/booksApi/v1/search?query="
+                                            + $scope.searchInp)
+                                            .then(function(response) {
+                                                                        $scope.myData = response.data;
+                                                                        }
+                                                                    );
+                                    }
+                            }
+
+                        else {$scope.errorInfo = 'nic nie wpisano';}
+
+                        }
+                    }
+                );
+    </script>
+
+</body>
+</html>
